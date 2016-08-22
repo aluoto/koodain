@@ -44,8 +44,24 @@ var upload = multer({storage: storage});
 
 function readDirContents(d) {
   return fsp.readdirAsync(d).then(function(files) {
-    var noDot = _.filter(files, function(f) { return !f.startsWith('.'); })
+    var noDot = _.filter(files, function(f) { 
+
+      //Changed line "return !f.startsWith('.');" to a following piece of code because 'undefined is not a function'
+      if (f[0] === '.') {
+        return false;
+      }
+      else
+      {
+        return false;
+      }
+    })      
+
+    
     var ps = _.map(noDot, function(f) {
+      console.log("ulull");
+      console.log(JSON.stringify(d));
+      console.log(JSON.stringify(f));
+
       return readFileOrDir(path.resolve(d,f));
     });
     return Promise.all(ps);
@@ -56,6 +72,7 @@ function readDirContents(d) {
 }
 
 function readFileOrDir(filename) {
+  console.log("filename: " + filename);
   return fsp.statAsync(filename).then(function(stat) {
     if (stat.isDirectory()) {
       return readDir(filename);
@@ -101,8 +118,12 @@ function readFile(filename) {
 exports.show = function(req, res) {
   var filename = req.params.file || '.';
   var p = path.resolve(GITDIR, req.params.project, filename);
+  
   readFileOrDir(p).then(function(file) {
+    console.log(file);
     res.json(file);
+
+
   },
   function(err) {
     if (err.code === 'ENOENT' || err.code === 'ENOTDIR' || err.code === 'EISDIR') {
@@ -110,6 +131,7 @@ exports.show = function(req, res) {
     }
     else {
       console.log(err);
+      console.log("moikka");
       res.status(500).json({error: "File error"});
     }
   }).then(null, errorHandler(res));
