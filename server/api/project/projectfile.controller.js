@@ -58,10 +58,6 @@ function readDirContents(d) {
 
     
     var ps = _.map(noDot, function(f) {
-      console.log("ulull");
-      console.log(JSON.stringify(d));
-      console.log(JSON.stringify(f));
-
       return readFileOrDir(path.resolve(d,f));
     });
     return Promise.all(ps);
@@ -72,7 +68,6 @@ function readDirContents(d) {
 }
 
 function readFileOrDir(filename) {
-  console.log("filename: " + filename);
   return fsp.statAsync(filename).then(function(stat) {
     if (stat.isDirectory()) {
       return readDir(filename);
@@ -120,10 +115,7 @@ exports.show = function(req, res) {
   var p = path.resolve(GITDIR, req.params.project, filename);
   
   readFileOrDir(p).then(function(file) {
-    console.log(file);
     res.json(file);
-
-
   },
   function(err) {
     if (err.code === 'ENOENT' || err.code === 'ENOTDIR' || err.code === 'EISDIR') {
@@ -131,7 +123,6 @@ exports.show = function(req, res) {
     }
     else {
       console.log(err);
-      console.log("moikka");
       res.status(500).json({error: "File error"});
     }
   }).then(null, errorHandler(res));
