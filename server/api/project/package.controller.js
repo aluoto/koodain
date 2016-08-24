@@ -20,6 +20,7 @@ var errorHandler = require('../common').errorHandler;
 var env = require('../../config/environment');
 var GITDIR = env.git.projects;
 
+var mqtt = require('mqtt');
 
 function tmpDirPromise() {
   return new Promise(function(resolve, reject) {
@@ -87,7 +88,39 @@ function createPackage(project) {
   return npmPackPromise(d);
 }
 
-function sendPackage(pkgBuffer, url) {
+function sendPackage(pkgBuffer, url, req) {
+
+  console.log(req.body);
+  var id = req.body.deviceId;
+
+
+
+  var client  = mqtt.connect('mqtt://130.230.16.45:1883');
+
+  client.on('connect', function () {
+      
+      //clear all retained messages
+      //client.publish('device/' + id + '/app', new byte[0],0,true);
+
+      //subscribe to new apps
+      //client.subscribe('device/app');
+      //subscribe to new apps for a certain device
+      //client.subscribe('device/' + deviceInfo.idFromDM + '/app');
+      //client.subscribe('device/' + deviceInfo.idFromDM + '/apps/delete');
+      //publish empty apps list
+
+      //client.publish('device/' + id + '/app', pkgBuffer, {retain: true});
+      client.publish('device/' + id + '/app', pkgBuffer);
+      
+
+      client.publish('device/debug', 'debug2', {retain: true});
+
+      client.subscribe('debug');
+
+      //update certain app
+      //client.subscribe('device/' + deviceInfo.idFromDM + '/app/' + aid + '/update');
+  });   
+
   var formData = {
     'filekey': {
       value: pkgBuffer,
@@ -97,7 +130,10 @@ function sendPackage(pkgBuffer, url) {
       }
     }
   };
-  return rp.post({url: url, formData: formData});
+  var emptyPromise;
+  return emptyPromise;
+
+  //return rp.post({url: url, formData: formData});
 }
 
 // Create package, i.e. deploy to device.
@@ -109,9 +145,28 @@ exports.create = function(req, res) {
   }).then(function(pkgFilename) {
     return fsp.readFileAsync(pkgFilename);
   }).then(function(pkgBuffer) {
-    return sendPackage(pkgBuffer, url);
+    return sendPackage(pkgBuffer, url, req);
   }).then(function(pkgBuffer) {
-    res.status(201).json();
+
+    var client  = mqtt.connect('mqtt://130.230.16.45:1883');
+
+    client.on('connect', function () {
+      client.subscribe('deployment');
+    });
+
+    client.on('message', function (topic, message) {
+      // message is Buffer
+      console.log("Message received to topic: " + topic);
+      console.log(message.toString());
+
+      if(topic === 'deployment' && message.toString() === 'ok')
+      {
+        res.status(201).json();
+      }
+
+    });
+    
+
   }).then(null, errorHandler(res));
 };
 
