@@ -816,11 +816,12 @@ angular.module('koodainApp')
   // Returns a promise for deploying the project to the device.
   function deployDevicePromise(device, projectName) {
     var url = device.url;
+    var id = device._id;
     Notification.info('Deploying ' + projectName + ' to ' + url);
     return $http({
       method: 'POST',
       url: '/api/projects/' +projectName + '/package',
-      data: {deviceUrl: url},
+      data: {deviceUrl: url, deviceId: id},
     });
   }
 
