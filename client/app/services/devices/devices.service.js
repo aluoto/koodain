@@ -20,6 +20,10 @@ angular.module('koodainApp')
    */
   .service('DeviceManager', function ($http, $resource, $q) {
 
+    // list of IDs os selected devices and applications based on device query and app query
+    // in the form of :  {devId:[appID, appId], devId: [appId, appId]}
+    var selectedNodes = {};
+
     function matchesId(id, device) {
       return device.id == id;
     }
@@ -107,7 +111,7 @@ angular.module('koodainApp')
       return false;
     }
 
-    function matchesAppQuery(device, query) {
+    function matchesAppQuery(device, query, devicequery) {
       if (typeof query === 'string') {
         query = Slick.parse(query);
       }
@@ -122,12 +126,19 @@ angular.module('koodainApp')
         return false;
       }
 
+      var flag = false;
       for (var i=0; i<apps.length; i++) {
         if (matchesApp(apps[i], query)) {
-          return true;
+          if(!devicequery && selectedNodes.devices.indexOf(device.id) == -1){
+            selectedNodes.devices.push(device.id);
+          }
+          selectedNodes.apps.push(apps[i].id);
+          flag = true;
+          //return true;
         }
       }
-      return false;
+      //return false;
+      return flag;
     }
 
     function matchesDeviceQuery(device, query) {
@@ -142,6 +153,7 @@ angular.module('koodainApp')
       var exprs = query.expressions;
       for (var i=0; i < exprs.length; i++) {
         if (matchesExpr(exprs[i], device)) {
+          selectedNodes.devices.push(device.id);
           return true;
         }
       }
@@ -152,20 +164,28 @@ angular.module('koodainApp')
       if (devicequery && !matchesDeviceQuery(device, devicequery)) {
         return false;
       }
-      if (appquery && !matchesAppQuery(device, appquery)) {
+      if (appquery && !matchesAppQuery(device, appquery, devicequery)) {
         return false;
       }
       return true;
     }
 
     function filter(devs, devicequery, appquery) {
+      selectedNodes = { devices: [], apps: [] };
+
       if (!devicequery && !appquery) {
-        return [];
+        return selectedNodes;
       }
 
-      return Object.keys(devs).filter(function(id) {
+      /*return  Object.keys(devs).filter(function(id) {
         return matches(devs[id], devicequery, appquery);
-      });
+      });*/
+
+      for(var devId in devs){
+        matches(devs[devId], devicequery, appquery);
+      }
+
+      return selectedNodes;
     }
 
     var N = 100;

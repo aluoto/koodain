@@ -6,7 +6,7 @@
 
 div(ng-include='"components/navbar/navbar.html"')
 
-.container
+.container(id='r')
   .jumbotron(ng-if="deployments.length", style="text-align:center; padding:24px;")
     | You have staged deployment changes
     br 
@@ -27,7 +27,7 @@ div(ng-include='"components/navbar/navbar.html"')
           strong {{device.id}}
           div
             ul.appinfo
-              li(ng-repeat="app in device.apps")
+              li(ng-repeat="app in device.apps | filter:filterSelApp")
                 strong {{app.name}} {{app.version}}
                 |  {{app.status}}
                 |  

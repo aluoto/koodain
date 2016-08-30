@@ -55,7 +55,7 @@ angular.module('koodainApp')
         face: 'FontAwesome',
         code: '\uf233',
         size: 50,
-        color: 'gray',
+        color: 'gray'
       },
       // comment the line below if you want to enable dragging
       fixed: true
@@ -67,17 +67,35 @@ angular.module('koodainApp')
         face: 'FontAwesome',
         code: '\uf233',
         size: 85,
-        color: 'purple',
+        color: 'purple'
       },
       //physics: false
       // comment the line below if you want to enable dragging
       fixed: true
+    },
+    app:{
+      shape: 'icon',
+      icon: {
+        face: 'FontAwesome',
+        code: '\uf059',
+        size: 50,
+        color: 'black'
+      }
+    },
+    'app:selected':{
+      shape: 'icon',
+      icon: {
+        face: 'FontAwesome',
+        code: '\uf059',
+        size: 70,
+        color: 'green'
+      }
     }
   };
 
   /// Returns a Vis.js group based on app name
   /// If the group doesn't exist, it's created in the visGroups object.
-  function createGroup(name) {
+  /*function createGroup(name) {
     var codes = {
       playSound: '\uf028',
       measureTemperature: '\uf0e4',
@@ -123,10 +141,11 @@ angular.module('koodainApp')
       }
     };
     return name;
-  }
+  }*/
 
   function groupForApp(app) {
-    return createGroup(app.name);
+    //return createGroup(app.name);
+    return 'app';
   }
 
   function groupForDevice() {
@@ -235,9 +254,10 @@ angular.module('koodainApp')
     var n = {
       id: 'app:' + app.id,
       label: app.name,
-      group: groupForApp(app),
-      title: generateAppTooltip(app),
-      selectable: false
+      group: groupForApp(),
+      //group: groupForApp(app),
+      title: generateAppTooltip(app)//,
+      //selectable: false
     };
     return n;
   }
@@ -268,15 +288,15 @@ angular.module('koodainApp')
     // Zooms out so all selected node fit on the canvas
     fitOnSelectedNodes : function(){
       // if only one device node is selected
-      if(selectedNodeIds.length == 1){
-        network.focus(selectedNodeIds[0], {scale:1});
+      if(selDevIds.length == 1){
+        network.focus(selDevIds[0], {scale:1});
       } else {
-        network.fit({nodes: selectedNodeIds});
+        network.fit({nodes: selDevIds});
       }
     },
     // if the number od selected nodes are more than 1 then crawling is meaningful
     checkCrawling: function(){
-      if(selectedNodeIds.length > 1){
+      if(selDevIds.length > 1){
         focusedNodeIndex = 0;
         $scope.isCrawlingPossible = true;
       } else {
@@ -285,20 +305,20 @@ angular.module('koodainApp')
       }
     },
     crawl : function(){
-      if(focusedNodeIndex >= 0 && focusedNodeIndex <= selectedNodeIds.length) {
+      if(focusedNodeIndex >= 0 && focusedNodeIndex <= selDevIds.length) {
         // crawling has completed one circle
-        if(focusedNodeIndex == selectedNodeIds.length){
+        if(focusedNodeIndex == selDevIds.length){
           Notification.info({message:"Crawling started again!", delay:1000});
         }
-        focusedNodeIndex %= selectedNodeIds.length;
-        network.focus(selectedNodeIds[focusedNodeIndex], {scale:1});
+        focusedNodeIndex %= selDevIds.length;
+        network.focus(selDevIds[focusedNodeIndex], {scale:1});
         focusedNodeIndex++; 
       }
     }
 
   };
 
-  var focusedNodeIndex = -1;
+ /* var focusedNodeIndex = -1;
   $scope.camera = {
     // Zooms out so all node fit on the canvas
     fit : function(){
@@ -333,31 +353,99 @@ angular.module('koodainApp')
       }
     }
 
-  };
+  };*/
 
-  // List of ids of the nodes that are currently selected
-  var selectedNodeIds = [];
+  $scope.filterSelApp = function(app){
+    //console.log(app);
+    //console.log(selAppIds);
+    //console.log($scope);
+    if( $scope.hasOwnProperty('appquery') && $scope.appquery.length != 0 && selAppIds.indexOf("app:" + app.id) == -1){
+      //console.log('no');
+      return false;
+    }
+    //console.log('yes');
+    return true;
+  }
 
-  function select(ns) {
-    nodes.update(selectedNodeIds.map(function(id) {
+  var selDevIds = [];
+  var selAppIds = [];
+
+  function select(devIds, appIds) {
+
+    nodes.update(selDevIds.map(function(id) {
       return {
         id: id,
         group: groupForDevice(allDevices[id])
       };
     }));
-    nodes.update(ns.map(function(id) {
+    nodes.update(devIds.map(function(id) {
       return {
         id: id,
         group: groupForDevice(allDevices[id]) + ':selected'
       };
     }));
-    //console.log("ns: " + ns);
-    //console.log("selectedNodeIds:" + selectedNodeIds);
-    selectedNodeIds = ns;
-    $scope.selectedDevices = selectedNodeIds.map(function(id) {
+
+    nodes.update(selAppIds.map(function(id) {
+      return {
+        id: id,
+        group: groupForApp()
+      };
+    }));
+    nodes.update(appIds.map(function(id) {
+      return {
+        id: id,
+        group: groupForApp() + ':selected'
+      };
+    }));
+
+    selDevIds = devIds;
+    selAppIds = appIds;
+
+    /*$scope.selectedDevices = selDevIds.map(function(id) {
+      return allDevices[id];
+    });*/
+
+    //console.log(selDevIds);
+
+    var selDevs = selDevIds.map(function(id) {
       return allDevices[id];
     });
-    //console.log($scope.selectedDevices);
+
+    //$scope.selectedDevices = selDevs;
+   
+    //var c = [];
+    /*var i =  selDevs.length;
+    var j;
+    console.log("before");
+    while(i--){
+      console.log("here: " + i);
+      console.log(selDevs[i].apps.length);
+      j = selDevs[i].apps.length;
+      //c = [];
+      while(j--){
+        console.log("there: " + j);
+        console.log(selDevs[i].apps[j]);
+        console.log(selAppIds);
+        if(selAppIds.indexOf("app:" + selDevs[i].apps[j].id) == -1){
+          console.log("no");
+          //console.log(j);
+          //c.push(j);
+          selDevs[i].apps.splice(j, 1);
+        } else {
+          console.log("yes");
+        }
+      }
+      /*for(var k = 0; k < c.length; k++){
+        console.log("ggggg: " + c[k]);
+        console.log(selDevs[i].apps[c[k]]);
+        //selDevs[i].apps.splice(c[k], 1);
+      }
+    }*/
+
+    //console.log(selDevs);
+    $scope.selectedDevices = selDevs;
+    /*console.log($scope.selectedDevices);*/
+
     $scope.camera.fit();
     $scope.camera.checkCrawling();
   }
@@ -368,13 +456,25 @@ angular.module('koodainApp')
   // Select devices based on what's in device query + app query fields
   // This is called every time either of them changes
   function updateSelection() {
-    var sel = deviceManager.filter(allDevices, $scope.devicequery, $scope.appquery);
-    //console.log(sel);
-    //if(sel.length > 0) {
-      findSelectedDevCaps(sel);
+    var selDevsAndApps = deviceManager.filter(allDevices, $scope.devicequery, $scope.appquery);
+    // extracting IDs of selected devices
+    var selDevices = selDevsAndApps.devices;
+
+    // extracting IDs of selected apps
+    var selApps = selDevsAndApps.apps.map(function(id){
+      return "app:" + id;
+    });
+
+    //if(!$scope.devicequery){
+      //$scope.devicequery = selDevices.map(function(id) { return '#'+id; }).join(',');
     //}
-    network.selectNodes(sel);
-    select(sel);
+
+    findSelectedDevCaps(selDevices);
+
+    var selNodes = selDevices.concat(selApps);
+    network.selectNodes(selNodes);
+    
+    select(selDevices, selApps);
   }
 
 
@@ -383,7 +483,7 @@ angular.module('koodainApp')
     onload: function(_network) {
       network = _network;
       $scope.$watch('devicequery', updateSelection);
-      //$scope.$watch('appquery', updateSelection);
+      $scope.$watch('appquery', updateSelection);
     },
     selectNode: selectClick,
     deselectNode: selectClick
@@ -510,7 +610,7 @@ angular.module('koodainApp')
     return !isAppNodeId(nodeId);
   }
 
-  var lastSelectedDevice = null;
+  //var lastSelectedDevices = null;
   // When the user clicks on the Vis.js network,
   // construct a comma-separated list of selected device id to be used as query.
   function selectClick(params) {
@@ -518,10 +618,22 @@ angular.module('koodainApp')
     //console.log("clicked");
     //console.log(params);
     var selDevices = params.nodes.filter(isDeviceNodeId);
+    var selApps = params.nodes.filter(isAppNodeId);
+    //console.log(selDevices);
+    //console.log(selApps);
     //findSelectedDevCaps(selDevices); 
     $scope.deselectProject();
-    $scope.devicequery = selDevices.map(function(id) { return '#'+id; }).join(',');
+    //if($scope.devicequery /*&& $scope.appquerry*/){
+      $scope.devicequery = selDevices.map(function(id) { return '#'+id; }).join(',');
+    //}
+    $scope.appquery = selApps.map(function(id) { return '#'+id.slice(4,id.length); }).join(',');
+
+    //$scope.appquery = "";
     $scope.$apply();  // Needed?
+
+    //$scope.devicequery = $scope.selectedDevices.map(function(dev) { return '#'+dev.id; }).join(',');
+    //console.log($scope.devicequery);
+    //$scope.$apply();  // Needed?
   }
 
   function findDeselectedDevice(newSelection, oldSelection){
