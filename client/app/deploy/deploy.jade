@@ -102,6 +102,13 @@ script(type="text/ng-template", id="manageapps.html")
           span(ng-if="!devicequery") to all the devices
           span(ng-if="appquery")  with an app matching
             code {{appquery}}
+          | using
+          br
+          | HTTP 
+          input(type="radio", name="protocol", value="HTTP") 
+          br
+          | MQTT 
+          input(type="radio", name="protocol", value="MQTT") 
           | . 
         small  (Approx. {{devices.length}} such devices.)
 

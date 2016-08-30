@@ -24,7 +24,7 @@ angular.module('koodainApp', [
   //'ngSanitize'
 ])
   //.constant('deviceManagerUrl', 'http://130.230.142.101:3001')
-  .constant('deviceManagerUrl', 'http://localhost:3000')
+  .constant('deviceManagerUrl', 'http://130.230.16.45:3000')
  .config(function ($stateProvider, $urlRouterProvider, $locationProvider, $httpProvider, NotificationProvider) {
     $urlRouterProvider
       .otherwise('/');
