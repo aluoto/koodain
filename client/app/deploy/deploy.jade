@@ -61,7 +61,7 @@ div(ng-include='"components/navbar/navbar.html"')
           label(for="devicequery") Device:
           input.form-control(id="devicequery", type="text", ng-model="devicequery", ng-model-options='{debounce: 200}', ng-change="deselectProject()")
           label(for="appquery") App:
-          input.form-control(id="appquery", type="text", ng-model="appquery", ng-model-options='{debounce: 200}')
+          input.form-control(id="appquery", type="text", ng-model="appquery", ng-model-options='{debounce: 200}', ng-change="deselectProject()")
       #network
         vis-network(data="graphData", options="graphOptions", events="graphEvents", component="network")
       p

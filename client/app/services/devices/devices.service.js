@@ -18,7 +18,7 @@ angular.module('koodainApp')
    *
    * See bottom of the file for the methods of this service.
    */
-  .service('DeviceManager', function ($http, $resource, $q) {
+  .service('DeviceManager', function ($http, $resource, $q, deviceManagerUrl) {
 
     // list of IDs os selected devices and applications based on device query and app query
     // in the form of :  {devId:[appID, appId], devId: [appId, appId]}
@@ -292,6 +292,24 @@ angular.module('koodainApp')
       return devs;*/
     }
 
+    function queryDevicess(deviceQuery, appQuery, operation){
+
+      /*if(deviceQuery === undefined && appQuery === undefined){
+        console.log("yes");
+      }
+
+      console.log(deviceQuery);
+      console.log(appQuery);*/
+
+      return $http({
+        method: 'GET',
+        url: deviceManagerUrl,
+        params: {device: deviceQuery, app: appQuery, operation: operation}
+      }).then(function(res) {
+       return res.data; 
+      });
+    } 
+
     /**
      * The service returns a function that takes a device manager URL as a parameter.
      * The function returns an object with the methods documented below.
@@ -303,6 +321,7 @@ angular.module('koodainApp')
       }
 
       return {
+        queryDevicess : queryDevicess,
         /**
          * Queries devices from the device manager.
          *
