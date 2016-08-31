@@ -24,6 +24,7 @@ angular.module('koodainApp', [
   //'ngSanitize'
 ])
 
+
   //.constant('deviceManagerUrl', 'http://130.230.142.101:3001')
   .constant('deviceManagerUrl', 'http://localhost:3000')
 
