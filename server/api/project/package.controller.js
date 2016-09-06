@@ -89,11 +89,9 @@ function createPackage(project) {
 }
 
 function sendPackage(pkgBuffer, url, req) {
-
+  var client  = mqtt.connect('mqtt://130.230.16.45:1883');
   console.log(req.body);
   var id = req.body.deviceId;
-
-  var client  = mqtt.connect('mqtt://130.230.16.45:1883');
 
   client.on('connect', function () {
       
@@ -109,7 +107,7 @@ function sendPackage(pkgBuffer, url, req) {
 
       //client.publish('device/' + id + '/app', pkgBuffer, {retain: true});
       client.publish('device/' + id + '/app', pkgBuffer);
-      
+      client.subscribe('deployment/' + req.body.deviceId);
 
       client.publish('device/debug', 'debug2', {retain: true});
 
@@ -128,8 +126,8 @@ function sendPackage(pkgBuffer, url, req) {
       }
     }
   };
-  var emptyPromise;
-  return emptyPromise;
+
+  return client;
 
   //return rp.post({url: url, formData: formData});
 }
@@ -138,33 +136,29 @@ function sendPackage(pkgBuffer, url, req) {
 exports.create = function(req, res) {
   var url = req.body.deviceUrl + '/app';
   Project.findOne({name: req.params.project}).then(function(project) {
-    if (!project) throw 404;
+    if (!project) throw 404; 
     return createPackage(project);
   }).then(function(pkgFilename) {
     return fsp.readFileAsync(pkgFilename);
   }).then(function(pkgBuffer) {
     return sendPackage(pkgBuffer, url, req);
-  }).then(function(pkgBuffer) {
+  }).then(function(client) {
 
-    var client  = mqtt.connect('mqtt://130.230.16.45:1883');
-
-    client.on('connect', function () {
-      client.subscribe('deployment');
-    });
+    var i = 0;
 
     client.on('message', function (topic, message) {
       // message is Buffer
       console.log("Message received to topic: " + topic);
       console.log(message.toString());
 
-      if(topic === 'deployment' && message.toString() === 'ok')
+      if(topic === 'deployment/' + req.body.deviceId && message.toString() === 'ok')
       {
+        client.unsubscribe('deployment/' + req.body.deviceId);
+        //internal rest response
         res.status(201).json();
       }
 
     });
-    
-
   }).then(null, errorHandler(res));
 };
 

@@ -568,9 +568,11 @@ angular.module('koodainApp')
   }
 
   $scope.setAppStatus = function(device, app, status) {
-    var url = device.url + '/app/' + app.id;
+    //var url = device.url + '/app/' + app.id;
+    var url = "http://localhost:9000/mqtt/" + device.id + '/app/' + app.id;
+
     return $http({
-      url: devicePipeUrl(url),
+      url: "http://localhost:9000/api/mqtt/" + device.id + '/app/' + app.id,
       method: 'PUT',
       data: {status: status},
     }).then(function(response) {
@@ -579,7 +581,7 @@ angular.module('koodainApp')
       //app.status = response.data.status;
       $scope.loadDevices();
     }, function(error){
-      Notification.error("Connection to the application was not succeccfull.");
+      Notification.error("Connection to the application was not successful.");
     });
   };
 
