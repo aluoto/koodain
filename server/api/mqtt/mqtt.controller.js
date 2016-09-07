@@ -14,12 +14,8 @@
 'use strict';
 
 var _ = require('lodash');
-//var Project = require('./mqtt.model');
-//var addProjectFiles = require('./projectfile.controller').addProjectFiles;
 var errorHandler = require('../common').errorHandler;
-
 var mqtt = require('mqtt');
-
 
 // Create a new project.
 exports.convert = function(req, res) {
@@ -28,15 +24,17 @@ exports.convert = function(req, res) {
   client.on('connect', function () {
 
       //publish empty apps list
-      console.log("publish to: " + 'device/' + req.params.device + '/apps/' + req.params.app);
-      client.publish('device/' + req.params.device + '/apps/' + req.params.app + '/status', JSON.stringify(req.body), {retain: true});
+      console.log("publish to: " + 'device/' + req.params.device + '/apps/' + req.params.app + '/status');
+      client.publish('device/' + req.params.device + '/apps/' + req.params.app + '/status', JSON.stringify(req.body)/*, {retain: true}*/);
 
       //update certain app
       //client.subscribe('device/' + deviceInfo.idFromDM + '/app/' + aid + '/update');
 
   });
 
+  console.log("req.body:");
   console.log(req.body);
+  //some kind of error handling would be nice
   return res.status(201);
   /*
   var data = req.body;
@@ -48,7 +46,7 @@ exports.convert = function(req, res) {
   }).then(null, errorHandler(res));
 */
 };
-
+/*
 function createProject(data) {
   var project;
   return Project.create(data).then(function(_project) {
@@ -74,3 +72,4 @@ function initProjectFiles(project) {
   };
   return addProjectFiles(files, project, vars);
 }
+*/
