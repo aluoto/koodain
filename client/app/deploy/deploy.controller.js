@@ -568,9 +568,12 @@ angular.module('koodainApp')
   }
 
   $scope.setAppStatus = function(device, app, status) {
-    //var url = device.url + '/app/' + app.id;
-    var url = "http://localhost:9000/mqtt/" + device.id + '/app/' + app.id;
+    
+    //var url = "http://localhost:9000/mqtt/" + device.id + '/app/' + app.id;
 
+    //note that this is also possible:
+    //https://www.npmjs.com/package/mqtt#webpack
+    //so its possible to prevent extra internal REST call
     return $http({
       url: "http://localhost:9000/api/mqtt/" + device.id + '/app/' + app.id,
       method: 'PUT',
@@ -580,6 +583,7 @@ angular.module('koodainApp')
       // would be better to load it from the server for realz...
       //app.status = response.data.status;
       $scope.loadDevices();
+      return response;
     }, function(error){
       Notification.error("Connection to the application was not successful.");
     });

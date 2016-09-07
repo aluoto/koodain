@@ -35,7 +35,7 @@ exports.convert = function(req, res) {
   console.log("req.body:");
   console.log(req.body);
   //some kind of error handling would be nice
-  return res.status(201);
+  res.status(201).end();
   /*
   var data = req.body;
   if (!data.name || !data.name.match(/^[a-z][a-z0-9]*$/)) {

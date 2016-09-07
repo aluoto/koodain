@@ -144,8 +144,6 @@ exports.create = function(req, res) {
     return sendPackage(pkgBuffer, url, req);
   }).then(function(client) {
 
-    var i = 0;
-
     client.on('message', function (topic, message) {
       // message is Buffer
       console.log("Message received to topic: " + topic);
