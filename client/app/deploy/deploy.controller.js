@@ -582,6 +582,7 @@ angular.module('koodainApp')
       // This is a bit of quickndirty way to update app,
       // would be better to load it from the server for realz...
       //app.status = response.data.status;
+
       $scope.loadDevices();
       return response;
     }, function(error){
