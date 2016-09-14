@@ -153,7 +153,8 @@ exports.create = function(req, res) {
       {
         client.unsubscribe('deployment/' + req.body.deviceId);
         //internal rest response
-        res.status(201).json();
+        return res.status(201).json();
+
       }
 
     });
