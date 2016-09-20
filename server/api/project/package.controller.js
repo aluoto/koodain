@@ -21,6 +21,7 @@ var env = require('../../config/environment');
 var GITDIR = env.git.projects;
 
 var mqtt = require('mqtt');
+var uuid = require('node-uuid');
 
 function tmpDirPromise() {
   return new Promise(function(resolve, reject) {
@@ -90,6 +91,7 @@ function createPackage(project) {
 
 function sendPackage(pkgBuffer, url, req) {
   var client  = mqtt.connect('mqtt://130.230.16.45:1883');
+  console.log("kukkuluuruu");
   console.log(req.body);
   var id = req.body.deviceId;
 
@@ -106,8 +108,13 @@ function sendPackage(pkgBuffer, url, req) {
       //publish empty apps list
 
       //client.publish('device/' + id + '/app', pkgBuffer, {retain: true});
-      client.publish('device/' + id + '/app', pkgBuffer);
-      client.subscribe('deployment/' + req.body.deviceId);
+      var mqttId = uuid.v1();      
+      console.log(mqttId);      
+      client.publish('device/' + id + '/app/request/' + mqttId, pkgBuffer);
+      
+      //old 'deployment' topic:
+
+      client.subscribe('device/' + id + '/app/reply/' + mqttId);
 
       client.publish('device/debug', 'debug2', {retain: true});
 
@@ -148,10 +155,14 @@ exports.create = function(req, res) {
       // message is Buffer
       console.log("Message received to topic: " + topic);
       console.log(message.toString());
+      
+      var arrStr = topic.split('/');
+      var mqttId = arrStr[4];
 
-      if(topic === 'deployment/' + req.body.deviceId && message.toString() === 'ok')
+
+      if(topic === 'device/' + req.body.deviceId + '/app/reply/' + mqttId && message.toString() === 'ok')
       {
-        client.unsubscribe('deployment/' + req.body.deviceId);
+        client.unsubscribe('/device/' + req.body.deviceId + '/app/reply/' + mqttId);
         //internal rest response
         return res.status(201).json();
 

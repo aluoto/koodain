@@ -23,12 +23,8 @@ exports.convert = function(req, res) {
   var client  = mqtt.connect('mqtt://130.230.16.45:1883');
   client.on('connect', function () {
 
-      //publish empty apps list
       console.log("publish to: " + 'device/' + req.params.device + '/apps/' + req.params.app + '/status');
       client.publish('device/' + req.params.device + '/apps/' + req.params.app + '/status', JSON.stringify(req.body)/*, {retain: true}*/);
-
-      //update certain app
-      //client.subscribe('device/' + deviceInfo.idFromDM + '/app/' + aid + '/update');
 
   });
 
