@@ -25,13 +25,19 @@ exports.convert = function(req, res) {
 
       console.log("publish to: " + 'device/' + req.params.device + '/apps/' + req.params.app + '/status');
       client.publish('device/' + req.params.device + '/apps/' + req.params.app + '/status', JSON.stringify(req.body)/*, {retain: true}*/);
+      //return res.status(201).json(req.body);
 
   });
 
   console.log("req.body:");
   console.log(req.body);
   //some kind of error handling would be nice
-  res.status(201).end();
+  //var promise = new Promise(function() {});
+  //promise.then(function() {
+    return res.status(201).end();
+  //});
+
+  //return promise;
   /*
   var data = req.body;
   if (!data.name || !data.name.match(/^[a-z][a-z0-9]*$/)) {

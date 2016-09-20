@@ -539,7 +539,12 @@ angular.module('koodainApp')
       }
     }).result.then(function() {
       $scope.deployments = [];
-      $scope.loadDevices();
+
+      //using timeout is not good...
+      setTimeout(function() {
+        $scope.loadDevices();
+      }, 1000);
+
     });
   };
 
@@ -584,9 +589,13 @@ angular.module('koodainApp')
       //app.status = response.data.status;
       //For some weird reason it seems that console.log() or alert() needs to be run
       //for the loadDevices to work.
-      console.log(response);
-      $scope.loadDevices();
-      return response;
+      
+
+      //there must be a better way to do this...:
+      setTimeout(function() {
+        $scope.loadDevices();
+      }, 250);
+
     }, function(error){
       Notification.error("Connection to the application was not successful.");
     });
