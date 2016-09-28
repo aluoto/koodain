@@ -20,7 +20,7 @@ var mqtt = require('mqtt');
 // Create a new project.
 exports.convert = function(req, res) {
 
-  var client  = mqtt.connect('mqtt://130.230.16.45:1883');
+  var client  = mqtt.connect('mqtt://130.230.142.101:1883');
   client.on('connect', function () {
 
       console.log("publish to: " + 'device/' + req.params.device + '/apps/' + req.params.app + '/status');

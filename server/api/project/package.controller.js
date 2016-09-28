@@ -90,8 +90,8 @@ function createPackage(project) {
 }
 
 function sendPackage(pkgBuffer, url, req) {
-  var client  = mqtt.connect('mqtt://130.230.16.45:1883');
-  console.log("kukkuluuruu");
+  var client  = mqtt.connect('mqtt://130.230.142.101:1883');
+
   console.log(req.body);
   var id = req.body.deviceId;
 
